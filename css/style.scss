@@ -1,0 +1,65 @@
+$vertical-margin: 3vh;
+$medium-padding: 10px;
+$large-padding: 20px;
+
+button {
+    border: none;
+    background: #0984e3;
+    color: #fff;
+    padding: $medium-padding $large-padding;
+    border-radius: $medium-padding;
+    cursor: pointer;
+}
+
+.input-box {
+    padding: $medium-padding;
+    border-radius: $medium-padding;
+    border: 1px solid #0984e3;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: $vertical-margin;
+}
+
+.container {
+    min-width: 300px;
+    width: 20vw;
+}
+
+.problem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .word {
+        font-weight: bold;
+        font-size: 2rem;
+    }
+
+    & > * {
+        margin: $vertical-margin 0;
+    }
+}
+
+.report {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .desc {
+        font-size: 1.5rem;
+    }
+}
+

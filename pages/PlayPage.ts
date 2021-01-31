@@ -1,21 +1,27 @@
 import {Word} from '../types/types';
 import store from '../store';
+import {EventBinder} from '../EventBinder';
 
 export class PlayPage {
     private wordsApiUrl: string = 'https://my-json-server.typicode.com/kakaopay-fe/resources/words';
+    private originWords: Array<Word>;
     private words: Array<Word>;
     private passSeconds: Array<number> = [];
     private score: number;
     private remainSecond: number;
     private wordTimer: any;
+    private isStart: boolean = false;
     private remainEl: HTMLSpanElement;
     private scoreEl: HTMLSpanElement;
     private wordEl: HTMLSpanElement;
     private startButtonEl: HTMLButtonElement;
     private inputBoxEl: HTMLInputElement;
+    private eventBinder: EventBinder;
 
     constructor() {
-        store.init();
+        this.eventBinder = new EventBinder();
+        this.init();
+        this.setWords().then();
     }
 
     private get activeWord(): Word {
@@ -30,13 +36,34 @@ export class PlayPage {
         return this.activeWord.second - this.remainSecond;
     }
 
-    private async fetchWords(): Promise<any> {
+    private async fetchWords(): Promise<Array<Word>> {
         const result = await fetch(this.wordsApiUrl);
         return result.json();
     }
 
-    public async start(): Promise<any> {
+    private async setWords(): Promise<Array<Word>> {
+        if (this.originWords) {
+            this.words = [...this.originWords];
+            return;
+        }
+
         this.words = await this.fetchWords();
+        this.originWords ||= [...this.words];
+    }
+
+    private init(): void {
+        this.words = [];
+        this.passSeconds = [];
+        this.score = null;
+        this.remainSecond = null;
+        clearInterval(this.wordTimer);
+        store.init();
+    }
+
+    private async start(): Promise<any> {
+        await this.setWords();
+
+        this.inputBoxEl.value = '';
         this.inputBoxEl.focus();
 
         this.setWordTimer();
@@ -45,16 +72,28 @@ export class PlayPage {
     }
 
     private clickStartButton(event: Event): void {
-        this.start();
+        if (this.isStart) {
+            this.isStart = false;
+            this.init();
+            this.renderTime();
+            this.renderScore();
+            this.renderWord();
+            this.renderStartButton('시작');
+        } else {
+            this.isStart = true;
+            this.start();
+            this.renderStartButton('초기화');
+        }
     }
 
     private keydownInputBox(event: KeyboardEvent): void {
         if (event.key !== 'Enter') return;
 
         this.inputBoxEl.value === this.activeWord.text && this.pass();
+        this.inputBoxEl.value = '';
     }
 
-    public calculateTotalReport(): void {
+    private calculateTotalReport(): void {
         if (!this.isFinish) return;
 
         const sum = this.passSeconds.reduce((sum: number, second: number) => sum + second, 0);
@@ -78,17 +117,18 @@ export class PlayPage {
         this.renderWord();
     }
 
-    private next() {
+    private next(): void {
         this.inputBoxEl.value = '';
         this.words.shift();
         this.setWordTimer();
     }
 
-    private pass() {
+    private pass(): void {
         this.passSeconds.push(this.activeSolveTime);
         this.next();
         if (this.isFinish) {
             this.calculateTotalReport();
+            this.destroy();
             window.location.hash = 'report';
         }
     }
@@ -98,20 +138,29 @@ export class PlayPage {
         this.next();
         if (this.isFinish) {
             this.calculateTotalReport();
+            this.destroy();
             window.location.hash = 'report';
         }
     }
 
     private renderTime(): void {
-        this.remainEl.textContent = this.remainSecond.toString();
+        this.remainEl.textContent = this.remainSecond?.toString();
     }
 
     private renderWord(): void {
-        this.wordEl.textContent = this.activeWord.text.toString();
+        this.wordEl.textContent = this.activeWord?.text?.toString();
     }
 
     private renderScore(): void {
-        this.scoreEl.textContent = this.score.toString();
+        this.scoreEl.textContent = this.score?.toString();
+    }
+
+    private renderStartButton(text: string): void {
+        this.startButtonEl.textContent = text;
+    }
+
+    private destroy(): void {
+        this.eventBinder.removeEventAll();
     }
 
     public mount(): void {
@@ -121,8 +170,8 @@ export class PlayPage {
         this.inputBoxEl ||= document.getElementById('inputBox') as HTMLInputElement;
         this.startButtonEl ||= document.getElementById('startButton') as HTMLButtonElement;
 
-        this.inputBoxEl.addEventListener('keydown', this.keydownInputBox.bind(this));
-        this.startButtonEl.addEventListener('click', this.clickStartButton.bind(this));
+        this.eventBinder.addEvent(this.inputBoxEl, 'keydown', this.keydownInputBox.bind(this));
+        this.eventBinder.addEvent(this.startButtonEl, 'click', this.clickStartButton.bind(this));
     }
 
     public render(): string {

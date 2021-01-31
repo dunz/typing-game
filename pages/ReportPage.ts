@@ -1,23 +1,37 @@
 import store from '../store';
+import {EventBinder} from '../EventBinder';
 
 export class ReportPage {
     private restartButtonEl: HTMLButtonElement;
     private scoreEl: HTMLSpanElement;
     private averageSecondEl: HTMLSpanElement;
+    private eventBinder: EventBinder;
 
-    public mount() {
+    constructor() {
+        this.eventBinder = new EventBinder();
+    }
+
+    private clickRestartButton(): void {
+        this.destroy();
+        window.location.hash = 'play';
+    }
+
+    private destroy(): void {
+        this.eventBinder.removeEventAll();
+    }
+
+    public mount(): void {
         this.scoreEl ||= document.getElementById('score') as HTMLSpanElement;
         this.averageSecondEl ||= document.getElementById('averageSecond') as HTMLSpanElement;
         this.restartButtonEl ||= document.getElementById('restart') as HTMLButtonElement;
 
-        this.restartButtonEl.addEventListener('click', () => {
-            window.location.hash = 'play';
-        });
         this.scoreEl.textContent = store.totalReport.score.toString();
         this.averageSecondEl.textContent = store.totalReport.averageSecond.toString();
+
+        this.eventBinder.addEvent(this.restartButtonEl, 'click', this.clickRestartButton.bind(this));
     }
 
-    public render() {
+    public render(): string {
         return `
             <section class="report">
                 <strong>Mission Complete!</strong>

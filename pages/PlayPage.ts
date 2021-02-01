@@ -57,6 +57,7 @@ export class PlayPage {
         this.score = null;
         this.remainSecond = null;
         clearInterval(this.wordTimer);
+        this.renderTimerData();
         store.init();
     }
 
@@ -65,24 +66,20 @@ export class PlayPage {
 
         this.inputBoxEl.value = '';
         this.inputBoxEl.focus();
+        this.score = this.words.length;
 
         this.setWordTimer();
-        this.score = this.words.length;
-        this.renderScore();
     }
 
     private clickStartButton(event: Event): void {
         if (this.isStart) {
             this.isStart = false;
             this.init();
-            this.renderTime();
-            this.renderScore();
-            this.renderWord();
             this.renderStartButton('시작');
         } else {
             this.isStart = true;
-            this.start();
             this.renderStartButton('초기화');
+            this.start();
         }
     }
 
@@ -113,8 +110,8 @@ export class PlayPage {
             this.renderWord();
             if (this.remainSecond === 0) this.over();
         }, 1000);
-        this.renderTime();
-        this.renderWord();
+
+        this.renderTimerData();
     }
 
     private next(): void {
@@ -135,7 +132,6 @@ export class PlayPage {
 
     private over(): void {
         this.score--;
-        this.renderScore();
         this.next();
         if (this.isFinish) {
             this.calculateTotalReport();
@@ -145,15 +141,24 @@ export class PlayPage {
     }
 
     private renderTime(): void {
+        if (!this.remainEl) return;
         this.remainEl.textContent = this.remainSecond?.toString();
     }
 
     private renderWord(): void {
+        if (!this.wordEl) return;
         this.wordEl.textContent = this.activeWord?.text?.toString();
     }
 
     private renderScore(): void {
+        if (!this.scoreEl) return;
         this.scoreEl.textContent = this.score?.toString();
+    }
+
+    private renderTimerData(): void {
+        this.renderTime();
+        this.renderWord();
+        this.renderScore();
     }
 
     private renderStartButton(text: string): void {

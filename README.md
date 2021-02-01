@@ -1,9 +1,9 @@
-# 1. Isntall Packages
+## 1. Isntall Packages
 ```bash
 npm install
 ```
 
-# 2. Start Dev Server
+## 2. Start Dev Server
 ```bash
 npm run dev
 ```

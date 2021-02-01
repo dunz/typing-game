@@ -135,6 +135,7 @@ export class PlayPage {
 
     private over(): void {
         this.score--;
+        this.renderScore();
         this.next();
         if (this.isFinish) {
             this.calculateTotalReport();

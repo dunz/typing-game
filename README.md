@@ -1,4 +1,4 @@
-## 1. Isntall Packages
+## 1. Install Packages
 ```bash
 npm install
 ```

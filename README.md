@@ -5,5 +5,5 @@ npm install
 
 # 2. Dev Server Start
 ```bash
-npm run serve
+npm run dev
 ```

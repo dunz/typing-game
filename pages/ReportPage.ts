@@ -18,6 +18,7 @@ export class ReportPage {
 
     private destroy(): void {
         this.eventBinder.removeEventAll();
+        this.eventBinder = null;
     }
 
     public mount(): void {

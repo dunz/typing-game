@@ -21,7 +21,7 @@ export class PlayPage {
     constructor() {
         this.eventBinder = new EventBinder();
         this.init();
-        this.setWords().then();
+        this.setWords();
     }
 
     private get activeWord(): Word {
@@ -161,6 +161,7 @@ export class PlayPage {
 
     private destroy(): void {
         this.eventBinder.removeEventAll();
+        this.eventBinder = null;
     }
 
     public mount(): void {
